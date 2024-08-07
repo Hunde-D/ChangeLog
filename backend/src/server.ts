@@ -1,9 +1,11 @@
 import express from "express";
+import { productRoute, updateRoute, updatePointRoute } from "./routes";
+
 
 const app = express();
+app.use("/api", productRoute);
+app.use("/api", updateRoute);
+app.use("/api", updatePointRoute);
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello NODE!</h1>");
-});
 
 export default app;
