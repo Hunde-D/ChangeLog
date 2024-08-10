@@ -1,23 +1,32 @@
 import { Router } from "express";
+import { body, validationResult } from "express-validator";
+import { handleError } from "../module/middleware";
+import {
+  createProduct,
+  deleteProduct,
+  getAllProducts,
+  getOneProduct,
+  updateProduct,
+} from "../handlers/product";
 
 const router = Router();
 
 //* Product Routes
 
-router.get("/product", (req, res) => {
-  return res.status(200).json({ message: "Get /product is working" });
-});
-router.post("/product", (req, res) => {
-  return res.status(200).json({ message: "Post /product is working" });
-});
-router.get("/product/:id", (req, res) => {
-  return res.status(200).json({ message: "Get /product/:id is working" });
-});
-router.put("/product/:id", (req, res) => {
-  return res.status(200).json({ message: "Put /product/:id is working" });
-});
-router.delete("/product/:id", (req, res) => {
-  return res.status(200).json({ message: "Delete /product/:id is working" });
-});
+router.get("/product", getAllProducts);
+router.post(
+  "/product",
+  body("name").isString(),
+  handleError as any,
+  createProduct
+);
+router.get("/product/:id", getOneProduct);
+router.put(
+  "/product/:id",
+  body("name").isString(),
+  handleError as any,
+  updateProduct
+);
+router.delete("/product/:id", deleteProduct);
 
 export default router;

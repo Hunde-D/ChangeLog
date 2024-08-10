@@ -1,17 +1,22 @@
 import JWT from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { Request, Response, NextFunction } from "express";
+import { CreateUser } from "./types";
 
 // Hash Password
-export const hashPassword = (password) => {
+export const hashPassword = (password: string): Promise<string> => {
   return bcrypt.hash(password, 5);
 };
 // Compare Password
-export const comparePassword = (password, hash) => {
+export const comparePassword = (
+  password: string,
+  hash: string
+): Promise<boolean> => {
   return bcrypt.compare(password, hash);
 };
 
 // Create JWT (Json Web Token)
-export const createJWT = (user) => {
+export const createJWT = (user: CreateUser) => {
   const token = JWT.sign(
     {
       id: user.id,
@@ -23,18 +28,22 @@ export const createJWT = (user) => {
 };
 
 // Protect Middleware to check if the user is authenticated
-export const protect = (req, res, next) => {
+export const protect = (
+  req: Request & { user?: any },
+  res: Response,
+  next: NextFunction
+): void => {
   const bearer = req.headers.authorization;
-  console.log("req.headers", req.headers);
-  console.log("bearer:", bearer);
 
   if (!bearer) {
-    return res.status(401).json({ message: "Not Authorized :(" });
+    res.status(401).json({ message: "Not Authorized :(" });
+    return;
   }
 
   const token = bearer.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ message: "No Token Found :(" });
+    res.status(401).json({ message: "No Token Found :(" });
+    return;
   }
   try {
     const decoded = JWT.verify(token, process.env.JWT_SECRET);
@@ -42,7 +51,7 @@ export const protect = (req, res, next) => {
     next();
     return;
   } catch (error) {
-    console.log("error:", error);
-    return res.status(401).json({ message: "Not Valid Token  :(" });
+    res.status(401).json({ message: "Not Valid Token  :(" });
+    return;
   }
 };
