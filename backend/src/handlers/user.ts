@@ -1,7 +1,7 @@
 import prisma from "../db";
 import { createJWT, hashPassword, comparePassword } from "../module/auth";
 
-export const createNewUser = async (req, res) => {
+export const createNewUser = async (req, res, next) => {
   try {
     if (!req.body || !req.body.username || !req.body.password) {
       return res
@@ -19,12 +19,13 @@ export const createNewUser = async (req, res) => {
     const token = createJWT(user);
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    error.type = " invalid_input";
+    next(error);
   }
 };
 
 // authenticate user
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
   try {
     if (!req.body || !req.body.username || !req.body.password) {
       return res
@@ -51,6 +52,7 @@ export const signin = async (req, res) => {
     const token = createJWT(user);
     res.status(200).json({ status: "Signin Successful", token: token });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    error.type = "input";
+    next(error);
   }
 };

@@ -36,8 +36,7 @@ export const protect = (
   const bearer = req.headers.authorization;
 
   if (!bearer) {
-    res.status(401).json({ message: "Not Authorized :(" });
-    return;
+    throw { type: "auth" };
   }
 
   const token = bearer.split(" ")[1];
@@ -50,8 +49,7 @@ export const protect = (
     req.user = decoded;
     next();
     return;
-  } catch (error) {
-    res.status(401).json({ message: "Not Valid Token  :(" });
-    return;
+  } catch (err) {
+    next(err);
   }
 };

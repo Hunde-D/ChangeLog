@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 import app from "./server";
-import { PORT } from "./config";
+import config from "./config";
 
 // Middleware function
 // const myLogger = function (req, res, next) {
@@ -11,6 +11,6 @@ import { PORT } from "./config";
 
 // app.use(myLogger);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`Server is running on port ${config.port}`);
 });

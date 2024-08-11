@@ -1,10 +1,11 @@
 import prisma from "../db";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Get all products
 export const getAllProducts = async (
   req: Request & { user: any },
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const user = await prisma.user.findUnique({
@@ -23,14 +24,16 @@ export const getAllProducts = async (
 
     res.json({ data: user.products });
   } catch (err) {
-    res.status(500).json({ message: "Internal Server Error" });
+    err.type = "database";
+    next(err);
   }
 };
 
 // Get a single product
 export const getOneProduct = async (
   req: Request & { user: any },
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const product = await prisma.product.findUnique({
@@ -47,15 +50,16 @@ export const getOneProduct = async (
     }
     res.json({ data: product });
     return;
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: error });
-    return;
+  } catch (err) {
+    err.type = "database";
+    next(err);
   }
 };
 // Create a product
 export const createProduct = async (
   req: Request & { user: any },
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const newProduct = await prisma.product.create({
@@ -65,8 +69,9 @@ export const createProduct = async (
       },
     });
     res.json({ data: newProduct });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (err) {
+    err.type = "database";
+    next(err);
   }
 };
 
@@ -74,10 +79,11 @@ export const createProduct = async (
 
 export const updateProduct = async (
   req: Request & { user: any },
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const updated = await prisma.product.update({
+    const product = await prisma.product.update({
       where: {
         id_belongsToId: {
           id: req.params.id,
@@ -89,11 +95,11 @@ export const updateProduct = async (
       },
     });
 
-    res.json({ data: updated });
+    res.json({ data: product });
     return;
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+  } catch (err) {
+    err.type = "auth";
+    next(err);
   }
 };
 
@@ -101,7 +107,8 @@ export const updateProduct = async (
 
 export const deleteProduct = async (
   req: Request & { user: any },
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const deleted = await prisma.product.delete({
@@ -113,7 +120,8 @@ export const deleteProduct = async (
       },
     });
     res.json({ message: "Product Deleted" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+  } catch (err) {
+    err.type = "input";
+    next(err);
   }
 };
