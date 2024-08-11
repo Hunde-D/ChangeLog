@@ -14,6 +14,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Main Route
+app.get("/", (req, res) => {
+  res.status(200).json({ messge: "your on main route" });
+});
+
 // Protected Routes
 app.use("/api", protect, productRoute);
 app.use("/api", protect, updateRoute);
